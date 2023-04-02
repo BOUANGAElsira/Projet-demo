@@ -1,65 +1,32 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:projetdemo/Model/FirebaseHelper.dart';
+import 'package:firebase_database/firebase_database.dart';
+import '../Model/Companies.dart';
 
-import 'SearchController.dart';
+class MainAppController {
+  final DatabaseReference _databaseReference =
+      FirebaseDatabase.instance.reference();
 
-class MainAppController extends StatefulWidget {
-  const MainAppController({super.key});
-
-  @override
-  State<MainAppController> createState() => _MainAppControllerState();
-}
-
-class _MainAppControllerState extends State<MainAppController> {
-  @override
-  Widget build(BuildContext context) {
-    Text title = Text('Compagnies Register');
-
-    return FutureBuilder(
-      future: FirebaseHelper().auth.currentUser(),
-      builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return Scaffold(
-            appBar: AppBar(
-              title: title,
-              actions: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.search)
-                )
-              ],
-            ),
-            body: TabBarView(
-              children: controller(),
-            ),
-          );
-        } else {
-          //Retourne un widget chargement
-          return Scaffold(
-            appBar: AppBar(
-              title: title,
-            ),
-            body: Center(
-              child: Text(
-                'Chargement...',
-                style: TextStyle(
-                  fontSize: 25.0,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.purple,
-                ),
-              ) 
-            ),
-          );
-        };
-      }
-    );
+  Future<List<Companies>> getCompanies() async {
+    // Récupérer une référence à la collection "companies"
+    final snapshot = await _databaseReference.child('companies').once();
+    
+    // Créer une liste vide pour stocker les entreprises récupérées
+    final companies = <Companies>[];
+    
+    // Parcourir chaque élément de la collection "companies"
+    final data = (snapshot as DataSnapshot).value as Map<String, dynamic>;
+    data.forEach((key, values) {
+      // Récupérer les informations de chaque entreprise et créer un objet "Companies"
+      final company = Companies(
+        id: key,
+        name: values['name'],
+        address: values['address'],
+      );
+      
+      // Ajouter l'objet "Companies" à la liste des entreprises
+      companies.add(company);
+    });
+    
+    // Retourner la liste des entreprises
+    return companies;
   }
-
-  List<Widget> controller() {
-    return [
-      SearchController(),
-    ];
-  }
-
 }

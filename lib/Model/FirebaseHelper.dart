@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'Companies.dart';
 
 class FirebaseHelper {
   //Authentification
@@ -13,18 +14,23 @@ class FirebaseHelper {
   }
 
   Future<User> handleCreate(
-      String mail, String password, String name, String address) async {
+    String mail, String password, String name, String address) async {
     UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-        email: mail, password: password);
-    User user = userCredential.user!;
-    String uid = user.uid;
-    Map<String, String> map = {
-      "uid": uid,
-      "name": name,
-      "address": address,
-    };
+      email: mail, password: password);
+      User user = userCredential.user!;
+      String uid = user.uid;
+      Map<String, String> map = {
+        "uid": uid,
+        "name": name,
+        "address": address,
+      };
 
-    addCompanies(uid, map);
+      addCompanies(uid, map);
+      return user;
+  }
+
+  Future<Stream<User?>> myId() async {
+    Stream<User?> user = await auth.authStateChanges();
     return user;
   }
 
@@ -35,4 +41,9 @@ class FirebaseHelper {
   addCompanies(String uid, Map map) {
     base_companies.child(uid).set(map);
   }
-}
+
+/*   Future<Companie> getUser(String id) async {
+    DataSnapshot snapshot = (await base_companies.child(id).once()).snapshot;
+    return Companie(snapshot);
+  }
+ */}

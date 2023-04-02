@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:projetdemo/Controller/CompaniesList.dart';
 import 'Controller/LoginController.dart';
 import 'Controller/MainAppController.dart';
 
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
           //On est authentifié
           User? user = snapshot.data;
           // Utiliser l'objet user pour faire des traitements
-          return new MainAppController();
+          return new CompaniesList();
         } else {
           //On n'est pas authentifié
           return new LoginController();

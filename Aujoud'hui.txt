@@ -1,0 +1,124 @@
+import 'package:firebase_database/firebase_database.dart';
+
+class Companie {
+  String? id;
+  String? name;
+  String? firstname;
+  String? initiales;
+
+  Companie(DataSnapshot snapshot) {
+    id = snapshot.key;
+    Map map = snapshot.value as Map<String, String>;
+    name = map['name'];
+    firstname = map['firstname'];
+    if (firstname != null && firstname!.length > 0) {
+      initiales = firstname![0];
+    }
+    if (name != null && name!.length > 0) {
+      if (initiales != null) {
+        initiales = initiales! + name![0]; //Avant: initiales += name[0]
+      } else {
+        initiales = name![0];
+      }
+    }
+  }
+
+  Map toMap(){
+    return {
+      'name': name,
+      'firstname': firstname,
+      'uid': id
+    };
+  }
+
+}
+
+#####################################################################################################################################################
+
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../Model/Companies.dart';
+import '../Model/FirebaseHelper.dart';
+import 'ProfileController.dart';
+
+class MainAppController extends StatefulWidget {
+  const MainAppController({Key? key});
+
+  @override
+  State<MainAppController> createState() => _MainAppControllerState();
+}
+
+class _MainAppControllerState extends State<MainAppController> {
+  late Future<List<DocumentSnapshot>> _companiesFuture;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late User? _company;
+
+  @override
+  void initState() {
+    super.initState();
+    initUser();
+    _companiesFuture = initUsersList();
+  }
+
+  Future<void> initUser() async {
+    _company = _auth.currentUser;
+    setState(() {});
+  }
+
+  Future<List<DocumentSnapshot>> initUsersList() async {
+    final snapshot = await FirebaseFirestore.instance.collection('companies').get();
+    return snapshot.docs;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home Page'),
+        actions: [
+          IconButton(
+            onPressed: () {}, 
+            icon: Icon(Icons.search)
+          ),
+          IconButton(
+            onPressed: () {}, 
+            icon: Icon(Icons.person)
+          ),
+        ],
+      ),
+      body: FutureBuilder<List<DocumentSnapshot>>(
+        future: _companiesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          final companies = snapshot.data!;
+          return ListView.builder(
+            itemCount: companies.length,
+            itemBuilder: (context, index) {
+              final companyData = companies[index].data()! as Map<String, dynamic>;
+              return ListTile(
+                title: Text(companyData['name'] as String),
+                subtitle: Text(companyData['address'] as String),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+######################################################################################################################################################
