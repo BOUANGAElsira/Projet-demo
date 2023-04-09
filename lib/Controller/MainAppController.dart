@@ -1,4 +1,4 @@
-import 'package:firebase_database/firebase_database.dart';
+/* import 'package:firebase_database/firebase_database.dart';
 import '../Model/Companies.dart';
 
 class MainAppController {
@@ -30,3 +30,4 @@ class MainAppController {
     return companies;
   }
 }
+ */

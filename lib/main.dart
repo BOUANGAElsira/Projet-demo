@@ -3,11 +3,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:projetdemo/Controller/CompaniesList.dart';
 import 'Controller/LoginController.dart';
-import 'Controller/MainAppController.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp().catchError((error) {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  ).catchError((error) {
     print("Erreur d'initialisation de Firebase : $error");
   });
   runApp(

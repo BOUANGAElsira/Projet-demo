@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:projetdemo/Model/FirebaseHelper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,10 +16,17 @@ class _LoginControllerState extends State<LoginController> {
   String? _address;
   String? _mail;
   String? _password;
+  String? _description;
+  String? _secteurActivite;
+  //
+  final CollectionReference _companies =
+      FirebaseFirestore.instance.collection('companies');
+  //
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Colors.white,
       appBar: new AppBar(
         title: new Text('Authentification'),
       ),
@@ -30,6 +38,7 @@ class _LoginControllerState extends State<LoginController> {
               width: MediaQuery.of(context).size.width - 40,
               height: MediaQuery.of(context).size.height / 2,
               child: new Card(
+                color: Colors.blueAccent,
                 elevation: 8.5,
                 child: Container(
                   margin: EdgeInsets.only(left: 7.0, right: 5.0),
@@ -70,31 +79,55 @@ class _LoginControllerState extends State<LoginController> {
         } else {
           if (_address != null) {
             if (_name != null) {
-              //Créer un compte
-              FirebaseHelper()
-                  .handleCreate(_mail!, _password!, _name!, _address!)
-                  .then((User user) {
-                print('New user ceated');
-              }).catchError((error) {
-                alerte(error.toString());
-              });
+              if (_description == null) {
+                if (_secteurActivite == null) {
+                  //Créer un compte
+                  FirebaseHelper()
+                      .handleCreate(_mail!, _password!, _name!, _address!,
+                          _description!, _secteurActivite!)
+                      .then((User user) {
+                    _create(_name!, _address!, _mail!, _description!,
+                        _secteurActivite!);
+                    print('New user ceated');
+                  }).catchError((error) {
+                    alerte(error.toString());
+                  });
+                } else {
+                  //Alerte de secteur d'activité
+                  alerte('No name, try to write a activity sector to continue');
+                }
+              } else {
+                //Alerte, pas de description
+                alerte('No address, try to write a description to continue');
+              }
             } else {
               //Alerte, pas de nom
-              alerte('No name, try to write a name to continue');
+              alerte('No address, try to write a name to continue');
             }
           } else {
-            //Alerte, pas de prenom
-            alerte('No address, try to write a address to continue');
+            //Alerte, pas de adresse
+            alerte('No name, try to write a address to continue');
           }
         }
       } else {
         //Alerte, pas de mot de passe
-        alerte('Error your pasword  is obligatory to continue');
+        alerte('Error your password  is obligatory to continue');
       }
     } else {
       //ALerte, pas de mail
       alerte('Error your mail  is obligatory to continue');
     }
+  }
+
+  Future<void> _create(String name, String address, String email,
+      String description, String secteurActivite) async {
+    await _companies.add({
+      "address": address,
+      "name": name,
+      "email": email,
+      "description": description,
+      "secteurActivite": secteurActivite
+    });
   }
 
   Future<void> alerte(String error) async {
@@ -158,6 +191,24 @@ class _LoginControllerState extends State<LoginController> {
         onChanged: (String) {
           setState(() {
             _address = String;
+          });
+        },
+      ));
+
+      widgets.add(new TextField(
+        decoration: InputDecoration(hintText: 'Enter your activity sector'),
+        onChanged: (String) {
+          setState(() {
+            _secteurActivite = String;
+          });
+        },
+      ));
+
+      widgets.add(new TextField(
+        decoration: InputDecoration(hintText: 'Enter your description'),
+        onChanged: (String) {
+          setState(() {
+            _description = String;
           });
         },
       ));

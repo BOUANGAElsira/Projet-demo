@@ -14,7 +14,7 @@ class FirebaseHelper {
   }
 
   Future<User> handleCreate(
-    String mail, String password, String name, String address) async {
+    String mail, String password, String name, String address, String description, String secteurActivite) async {
     UserCredential userCredential = await auth.createUserWithEmailAndPassword(
       email: mail, password: password);
       User user = userCredential.user!;
@@ -23,6 +23,9 @@ class FirebaseHelper {
         "uid": uid,
         "name": name,
         "address": address,
+        "mail": mail,
+        "description": description,
+        "secteurActivite": secteurActivite
       };
 
       addCompanies(uid, map);

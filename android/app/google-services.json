@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "607441100336",
-    "project_id": "demodidier-37539",
-    "storage_bucket": "demodidier-37539.appspot.com"
+    "project_number": "1096768025061",
+    "project_id": "demo1-aca96",
+    "storage_bucket": "demo1-aca96.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:607441100336:android:cfd10d575067c7067a57f5",
+        "mobilesdk_app_id": "1:1096768025061:android:42684904a3b2cb38623f0c",
         "android_client_info": {
           "package_name": "com.example.projetdemo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "607441100336-uinpp8jom0lsfgi7nttrmqkepdljbrpo.apps.googleusercontent.com",
+          "client_id": "1096768025061-hhucu69rgb3dnso6s31vmkgnih34vgam.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDshITlryubAEj3LtioWxUdgn2Fzyh-X1s"
+          "current_key": "AIzaSyCWSaV5GmkC-OZzG2EhrUNhDnaA5Hh5tbA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "607441100336-uinpp8jom0lsfgi7nttrmqkepdljbrpo.apps.googleusercontent.com",
+              "client_id": "1096768025061-hhucu69rgb3dnso6s31vmkgnih34vgam.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

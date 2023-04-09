@@ -1,11 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/animation/animation_controller.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:flutter/src/widgets/ticker_provider.dart';
-
-import '../Model/Companies.dart';
-import 'MainAppController.dart';
+import 'CompanyDetails.dart';
 
 class CompaniesList extends StatefulWidget {
   const CompaniesList({super.key});
@@ -14,36 +9,117 @@ class CompaniesList extends StatefulWidget {
   State<CompaniesList> createState() => _CompaniesListState();
 }
 
+Widget _buildInitialsAvatar(String name) {
+  List<String> names = name.split(' ');
+  String initials = '';
+  for (String name in names) {
+    initials += name[0].toUpperCase();
+  }
+  return CircleAvatar(
+    backgroundColor: Colors.blueAccent,
+    child: Text(
+      initials,
+      style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
+}
+
 class _CompaniesListState extends State<CompaniesList> {
-final MainAppController controller = MainAppController();
+  final CollectionReference _companies =
+      FirebaseFirestore.instance.collection('companies');
+  final TextEditingController _searchController = TextEditingController();
+  String _searchText = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Liste des entreprises'),
+        title: const Text('Company list'),
+        actions: [
+          SizedBox(
+            width: 200,
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search',
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchText = value;
+                });
+              },
+            ),
+          ),
+        ],
       ),
-      body: FutureBuilder<List<Companies>>(
-        future: controller.getCompanies(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final companies = snapshot.data;
+      body: StreamBuilder(
+        stream: _companies.snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+          if (streamSnapshot.hasData) {
+            final List<DocumentSnapshot> filteredCompanies = streamSnapshot
+                .data!.docs
+                .where((document) =>
+                    document['name']
+                        .toLowerCase()
+                        .contains(_searchText.toLowerCase()))
+                .toList();
+
             return ListView.builder(
-              itemCount: companies!.length,
+              itemCount: filteredCompanies.length,
               itemBuilder: (context, index) {
-                final company = companies[index];
-                return ListTile(
-                  title: Text(company.name),
-                  subtitle: Text(company.address),
+                final DocumentSnapshot documentSnapshot =
+                    filteredCompanies[index];
+                return Card(
+                  margin: const EdgeInsets.all(10),
+                  child: ListTile(
+                    leading: _buildInitialsAvatar(documentSnapshot['name']),
+                    title: Text(documentSnapshot['name']),
+                    subtitle: Text(documentSnapshot['address']),
+                    trailing: SizedBox(
+                      width: 100,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.arrow_forward),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CompanyDetail(
+                                      document: documentSnapshot),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 );
               },
             );
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Erreur de chargement des entreprises.'));
-          } else {
-            return Center(child: CircularProgressIndicator());
           }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );
-  }}
+  }
+
+  Widget _buildInitialsAvatar(String name) {
+    final initials = name.split(' ').map((word) => word.substring(0, 1));
+    return CircleAvatar(
+      child: Text(initials.join()),
+    );
+  }
+}
