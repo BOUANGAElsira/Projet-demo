@@ -38,7 +38,7 @@ class _LoginControllerState extends State<LoginController> {
               width: MediaQuery.of(context).size.width - 40,
               height: MediaQuery.of(context).size.height / 2,
               child: new Card(
-                color: Colors.blueAccent,
+                color: Colors.white,
                 elevation: 8.5,
                 child: Container(
                   margin: EdgeInsets.only(left: 7.0, right: 5.0),
@@ -79,8 +79,9 @@ class _LoginControllerState extends State<LoginController> {
         } else {
           if (_address != null) {
             if (_name != null) {
-              if (_description == null) {
-                if (_secteurActivite == null) {
+              print('valeur de _description : $_description');
+              if (_description != null) {
+                if (_secteurActivite != null) {
                   //Créer un compte
                   FirebaseHelper()
                       .handleCreate(_mail!, _password!, _name!, _address!,
@@ -94,11 +95,11 @@ class _LoginControllerState extends State<LoginController> {
                   });
                 } else {
                   //Alerte de secteur d'activité
-                  alerte('No name, try to write a activity sector to continue');
+                  alerte('No activity sector, try to write a activity sector to continue');
                 }
               } else {
                 //Alerte, pas de description
-                alerte('No address, try to write a description to continue');
+                alerte('No description, try to write a description to continue');
               }
             } else {
               //Alerte, pas de nom
